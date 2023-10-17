@@ -1,0 +1,13 @@
+.homeBody {
+  width: 100%;
+  margin: 10px 20px;
+}
+
+#tideChart {
+  width: 800px;
+  height: 200px;
+}
+
+.tideInfo {
+  width: 500px;
+}

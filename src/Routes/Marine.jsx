@@ -1,6 +1,7 @@
 import "./Marine.css";
 import { useState, useEffect } from "react";
 
+
 export function Marine() {
   const [tidesList, setTidesList] = useState([]);
   const [coordinates, setCoordinates] = useState([]);
@@ -40,19 +41,38 @@ export function Marine() {
     <div>
       <div className="marine-body">
         {tidesList.map((forecast, index) => (
-          <div key={index}>
-            <p>{forecast.date}</p>
-            <p>{forecast.hourly[0].swellDir}</p>
-            <p>{forecast.hourly[0].swellDir16Point}</p>
-            <p>{forecast.hourly[0].swellHeight_ft}</p>
-            <p>{forecast.hourly[0].swellPeriod_secs}</p>
-            <p>{forecast.hourly[0].winddir16Point}</p>
-            <p>{forecast.hourly[0].winddirDegree}</p>
-            <p>{forecast.hourly[0].windspeedMiles}</p>
+        <div key={index}>
+          <div className="container text-center">
+            <div className="row align-items-center">
+                {forecast.hourly.slice(0, 8).map((hourlyData, hourlyIndex) =>(
+                <div className="col" key={hourlyIndex}>
+                  <ul>
+                    <p>{hourlyData.time}</p>
+                    <div className="swell">
+                      <p>Swell</p>
+                      <p>{hourlyData.swellHeight_ft}ft</p>
+                      <p>{hourlyData.swellDir}</p>
+                      <p>{forecast.hourly[0].swellDir16Point}</p>
+                      <div className="swell-time">
+                        <p>{hourlyData.swellPeriod_secs}</p>
+                        <p>secs</p>
+                      </div>
+                    </div>
+                    <div className="wind">
+                      <p>Wind</p>
+                      <p>{hourlyData.windspeedMiles}mph</p>
+                      <p>{hourlyData.winddir16Point}</p>
+                      <p>{hourlyData.winddirDegree}</p>
+                    </div>
+                  </ul>
+                </div>
+                ))}
+            </div>    
             <p>{forecast.astronomy[0].sunrise}</p>
             <p>{forecast.astronomy[0].sunset}</p>
-          </div>
-        ))}
+          </div>  
+        </div>  
+        ))} 
       </div>
     </div>
   );
