@@ -7,6 +7,8 @@ export function Home() {
   const [currentTide, setCurrentTide] = useState(null);
   const [tidePoints, setTidePoints] = useState([]);
   const [flattenedTidePoints, setFlattenedTidePoints] = useState([]);
+  const [timePoints, setTimePoints] = useState([]); // Initialize timePoints
+  const [flattenedTimePoints, setFlattenedTimePoints] = useState([]);
 
   const successCallback = (position) => {
     console.log(position);
@@ -32,14 +34,17 @@ export function Home() {
           const currentTide = json.data.weather[0];
           console.log(currentTide);
           setCurrentTide(currentTide);
-          const tidePoints = json.data.weather.map((week) =>
-            week.tides[0].tide_data.map((tide) => parseFloat(tide.tideHeight_mt))
-          );
+
+          const tidePoints = json.data.weather[0].tides[0].tide_data.map((tide) => parseFloat(tide.tideHeight_mt));
           console.log(tidePoints);
           setTidePoints(tidePoints);
           const flattenedTidePoints = tidePoints.flat();
           console.log(flattenedTidePoints);
-          setFlattenedTidePoints(flattenedTidePoints); // Set flattenedTidePoints state
+          setFlattenedTidePoints(flattenedTidePoints);
+
+          const timePoints = json.data.weather[0].tides[0].tide_data.map((tide) => tide.tideTime)
+          console.log(timePoints);
+          setTimePoints(timePoints);
         })
         .catch((error) => {
           console.error("Error fetching tide data:", error);
@@ -57,30 +62,45 @@ export function Home() {
           existingChart.destroy();
         }
 
+        const yLabels = [
+          '00:00', '03:00', '06:00', '09:00',
+          '12:00', '15:00', '18:00', '21:00', '24:00'
+        ];
+
+        // Create a new array for flattenedTidePoints with null values
+        const updatedFlattenedTidePoints = new Array(timePoints.length).fill(null);
+
+        // Add the new data point at 12:30
+        const newDataPointIndex = timePoints.indexOf("12:30");
+        if (newDataPointIndex !== -1) {
+          updatedFlattenedTidePoints[newDataPointIndex] = 1.2;
+        }
+
         new Chart(chartCanvas, {
           type: 'line',
           data: {
-            labels: flattenedTidePoints.map((_, index) => index),
+            labels: timePoints, // Use updated timePoints as labels
             datasets: [
               {
                 label: 'Tide Heights',
-                data: flattenedTidePoints,
+                data: updatedFlattenedTidePoints,
                 tension: 0.5,
               },
             ],
           },
           options: {
             scales: {
+              x: { labels: yLabels },
               y: {
-                suggestedMax: Math.max(...flattenedTidePoints),
-                suggestedMin: Math.min(...flattenedTidePoints),
+                suggestedMax: Math.max(...updatedFlattenedTidePoints),
+                suggestedMin: Math.min(...updatedFlattenedTidePoints),
               },
             },
           },
         });
       }
     }
-  }, [flattenedTidePoints]);
+  }, [flattenedTidePoints, timePoints]);
 
   return (
     <div>
